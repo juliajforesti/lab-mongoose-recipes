@@ -27,11 +27,11 @@ mongoose
       const result2 = await Recipe.insertMany(data)
       console.log('RECEITAS INSERIDAS', result2.map(recipe => recipe.title))
   
-      const update = await Recipe.findOneAndUpdate({title: 'Brigadeiro'}, {title: 'Brigadeiro da Julia'}, {new:true})
+      const update = await Recipe.findOneAndUpdate({title: 'Brigadeiro'}, {$set: {title: 'Brigadeiro da Julia'}}, {new: true})
       console.log('RECEITA ATUALIZADA', update.title)
   
       const del = await Recipe.deleteOne({title: 'Rigatoni alla Genovese'})
-      console.log('RECEITA DELETADA:', del)
+      console.log('RECEITA DELETADA COM SUCESSO:', Boolean(del.ok), 'QUANTIDADE DELETADA:', del.deletedCount)
 
     } catch(err) {console.log(err)}
   })
