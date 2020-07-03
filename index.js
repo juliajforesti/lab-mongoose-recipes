@@ -1,70 +1,55 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // Import of the model Recipe from './models/Recipe.model.js'
-const Recipe = require("./models/Recipe.model");
+const Recipe = require('./models/Recipe.model');
 // Import of the data from './data.json'
-const data = require("./data");
+const data = require('./data');
 
-const MONGODB_URI = "mongodb://localhost:27017/recipe-app";
+const MONGODB_URI = 'mongodb://localhost:27017/recipe-app';
 
 // Connection to the database "recipe-app"
 mongoose
   .connect(MONGODB_URI, {
     useCreateIndex: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
+    useUnifiedTopology: true
   })
-  .then((self) => {
+  .then(self => {
     console.log(`Connected to the database: "${self.connection.name}"`);
     // Before adding any documents to the database, let's delete all previous entries
-    self.connection.dropDatabase();
-    // inserindo receita de BRIGADEIRO
-    Recipe.create([brigadeiro])
-      .then(() => {
-        console.log("Criado:", brigadeiro.title);
-
-        // inserindo array de receitas do data.json
-        Recipe.insertMany(data)
-          .then((receitas) => {
-            receitas.forEach((elem) =>
-              console.log("CRIOU VARIOS:", elem.title)
-            );
-
-            // UPDATE
-            Recipe.findOneAndUpdate(
-              { title: "Brigadeiro" },
-              { duration: 100 },
-              { new: true }
-            )
-              .then((response) => {
-                console.log(response);
-                // DELETE
-                Recipe.deleteOne({ title: "Carrot Cake" })
-                  .then((response) => {
-                    console.log(response);
-                    mongoose.disconnect();
-                  })
-                  .catch((error) => console.log(error));
-              })
-              .catch((error) => console.log(error));
-          })
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
+    return self.connection.dropDatabase();
   })
-  .catch((error) => {
-    console.error("Error connecting to the database", error);
+  .then(async () => {
+    try {
+      const result = await Recipe.create(myRecipe)
+      console.log('NOVA RECEITA:',result.title)
+  
+      const result2 = await Recipe.insertMany(data)
+      console.log('RECEITAS INSERIDAS', result2.map(recipe => recipe.title))
+  
+      const update = await Recipe.findOneAndUpdate({title: 'Brigadeiro'}, {title: 'Brigadeiro da Julia'}, {new:true})
+      console.log('RECEITA ATUALIZADA', update.title)
+  
+      const del = await Recipe.deleteOne({title: 'Rigatoni alla Genovese'})
+      console.log('RECEITA DELETADA:', del)
+
+    } catch(err) {console.log(err)}
+  })
+  .catch(error => {
+    console.error('Error connecting to the database', error);
   });
 
-const brigadeiro = new Recipe({
-  title: "Brigadeiro",
-  level: "Easy Peasy",
-  ingredients: ["leite consensado", "achocolatado", "manteiga"],
-  cuisine: "Brasileira",
-  dishType: "Desert",
-  image:
-    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAASABkDASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAUDBggC/8QAGAEAAgMAAAAAAAAAAAAAAAAABAUAAQP/2gAMAwEAAhADEAAAAUlX1ln5W3pdwl0XKR8gMTEmDIj/xAAeEAABBAIDAQAAAAAAAAAAAAADAQIEBQAGBxMXMv/aAAgBAQABBQJ3GFgA8qjnVZKrU5VwfyTO1M5HhGLY6DEIK07lxv2JqKpGNRc//8QAGBEAAgMAAAAAAAAAAAAAAAAAAAECEDH/2gAIAQMBAT8BwaVQP//EABoRAAICAwAAAAAAAAAAAAAAAAABAhEQITH/2gAIAQIBAT8BUr6ObvTwz//EAC0QAAEDAgIFDQAAAAAAAAAAAAEAAgMEERMiBRASMfEUITVBYXGRkpOx0eHw/9oACAEBAAY/AsSGtgy5mgXaShFpOTCjlacscocXfC5PTVkQjaMxN727l0mfR+0N6p6mFk8gMdnbLbtbbisSoE42WEMHV23W9nivL7I8w/NTbADhq//EAB8QAAICAgMAAwAAAAAAAAAAAAERACExcUGBoVHh8f/aAAgBAQABPyEkRkaOMC2BuFpkqgY6PmGLNUwuigz5mLI7v7jXMsmQBB4onqKTDwExotQfZ+Jg33EcEwqlFiI2hm8Z+Z//2gAMAwEAAgADAAAAEEAnIf/EAB0RAQABAwUAAAAAAAAAAAAAAAEAESExQXGBkcH/2gAIAQMBAT8Qo4y2U7Ya7Ew4PZ//xAAYEQEAAwEAAAAAAAAAAAAAAAABABARof/aAAgBAgEBPxBnigUcr//EACMQAQEAAgEDAwUAAAAAAAAAAAERACFBYXGREDFRobHB0fD/2gAIAQEAAT8QTVBhBLUI4qyVyb0rmNyCUlRuIDxsqNBtBkNTSijv6DtWex8E2P7H1xXhbi8RSkCHK7wy9qooIakCDqh4M/kvzhQhAjtf7cWYYUEdMNRtQzqPBnWec//Z",
-  duration: 15,
-  creator: "Julia e Marcela",
-});
+
+  const myRecipe =   {
+    "title": "Brigadeiro",
+    "level": "Amateur Chef",
+    "ingredients": [
+      "1 lata de leite condensado",
+      "2 colheres de nescau",
+      "1 colher de manteiga",
+    ],
+    "cuisine": "Brasilian",
+    "dishType": "Dessert",
+    "duration": 20,
+    "creator": "Julia"
+  }
